@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Enforce the commit convention: "<problem>: clean|slow|solution"
+# Exempt: merges, reverts, and messages prefixed "repo:" for tooling changes.
+
+msg_file="$1"
+subject="$(head -n1 "$msg_file")"
+
+case "$subject" in
+  Merge*|Revert*|repo:*) exit 0 ;;
+esac
+
+if printf '%s' "$subject" | grep -Eq '^.+: (clean|slow|solution)$'; then
+  exit 0
+fi
+
+cat >&2 <<'MSG'
+Rejected: commit subject must be
+
+  <problem>: clean       would pass an interview
+  <problem>: slow        solved, but over time or ugly
+  <problem>: solution    needed the answer
+
+Use "repo: ..." for tooling or README changes.
+MSG
+exit 1

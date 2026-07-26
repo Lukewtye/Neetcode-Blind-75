@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Require the two-line header (approach + complexity) on staged solution files.
+# Applies to exercism/ and neetcode/ only.
+
+fail=0
+while IFS= read -r f; do
+  [ -f "$f" ] || continue
+  case "$f" in
+    exercism/*|neetcode/*) ;;
+    *) continue ;;
+  esac
+  case "$f" in
+    *.py|*.cpp|*.c|*.h|*.hpp|*.js) ;;
+    *) continue ;;
+  esac
+
+  head2="$(head -n2 "$f")"
+  if ! printf '%s' "$head2" | grep -qiE '^[[:space:]]*(#|//).*approach'; then
+    echo "missing 'Approach:' comment in first two lines: $f" >&2
+    fail=1
+  fi
+  if ! printf '%s' "$head2" | grep -qiE 'complexity|O\('; then
+    echo "missing complexity comment in first two lines: $f" >&2
+    fail=1
+  fi
+  if printf '%s' "$head2" | grep -qE 'O\(\?\)'; then
+    echo "complexity still a placeholder 'O(?)': $f" >&2
+    fail=1
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACM)
+
+exit $fail

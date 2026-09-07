@@ -1,5 +1,4 @@
-#approach: sort function pythonically, check neighbors starting with index 1 for 
-#similar values.
+#approach: sort function, check neighbors starting with index 1 for similar values
 #complexity: time: O(n log n) space: O(n)
 
 from typing import List
